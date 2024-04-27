@@ -7,18 +7,18 @@ from tkinter import ttk
 
 def load_data(filepath):
     data = pd.read_excel(filepath)
-    # Exclude non-feature columns explicitly and check for NaNs
     features = data.drop(['Pressure_Strain', 'FileType', 'Dataset'], axis=1)
     target = data['Pressure_Strain']
 
-    # Check and handle NaNs
-    if features.isna().any().any() or target.isna().any():
-        features = features.fillna(features.mean())  # Filling NaNs with the mean of each column
-        target = target.fillna(target.mean())  # Filling NaNs in the target
+    # Impute NaN values with column mean
+    features = features.fillna(features.mean())
 
     scaler = StandardScaler()
     features = scaler.fit_transform(features)
     return features, target
+
+
+
 
 def predict(features):
     model = tf.keras.models.load_model('dnn.h5')

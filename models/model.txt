@@ -9,3 +9,6 @@ Physics-Informed Neural Networks (PINNs):
 These incorporate known laws of physics into the learning process, ensuring that predictions adhere to physical principles. This approach might be particularly beneficial in turbulence modeling, where maintaining physical consistency in predictions is crucial.
 Random Forests or Gradient Boosting Machines:
 These ensemble learning methods are robust and can model complex nonlinear relationships. They could be useful for predicting pressure-strain if the features are well-engineered and the interactions are not excessively dominated by spatial or temporal patterns.
+ Gated Recurrent Units (GRUs):
+GRUs are similar to LSTMs as they are both designed to help a neural network remember past data in memory sequences. However, GRUs are simpler and faster to train than LSTMs due to having fewer parameters, which might lead to better performance on datasets where the additional complexity of LSTMs does not provide a benefit.
+

@@ -4,6 +4,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 import tkinter as tk
 from tkinter import ttk
+import numpy as np
 
 def load_data(filepath):
     data = pd.read_excel(filepath)
@@ -20,8 +21,8 @@ def load_data(filepath):
     features = scaler.fit_transform(features)
     return features, target
 
-def predict(features):
-    model = tf.keras.models.load_model('dnn.h5')
+def predict(model_path, features):
+    model = tf.keras.models.load_model(model_path)
     predictions = model.predict(features)
     return predictions
 
@@ -29,7 +30,14 @@ def evaluate(predictions, actual):
     mse = mean_squared_error(actual, predictions)
     return mse
 
-def display_results(actual, predictions, mse):
+def calculate_accuracy(actual, predictions, tolerance=0.1):
+    # Define accuracy as the percentage of predictions within 'tolerance' of actual values
+    correct_predictions = np.sum(np.abs(predictions.flatten() - actual) <= tolerance * np.abs(actual))
+    total_predictions = len(actual)
+    accuracy = (correct_predictions / total_predictions) * 100
+    return accuracy
+
+def display_results(actual, predictions, mse, accuracy):
     root = tk.Tk()
     root.title("Model Predictions and Accuracy")
     tree = ttk.Treeview(root, columns=('Actual', 'Predicted'), show='headings')
@@ -38,16 +46,23 @@ def display_results(actual, predictions, mse):
     tree.pack(fill=tk.BOTH, expand=True)
     for act, pred in zip(actual, predictions.flatten()):
         tree.insert('', 'end', values=(act, pred))
+
+    # Display MSE and accuracy
     mse_label = ttk.Label(root, text=f"Mean Squared Error: {mse:.4f}", font=("Arial", 16))
     mse_label.pack(pady=10)
+    accuracy_label = ttk.Label(root, text=f"Accuracy: {accuracy:.2f}%", font=("Arial", 16))
+    accuracy_label.pack(pady=10)
+
     root.mainloop()
 
 def main():
     data_path = 'testing.xlsx'
+    model_path = 'dnn.h5'
     features, actual = load_data(data_path)
-    predictions = predict(features)
+    predictions = predict(model_path, features)
     mse = evaluate(predictions, actual)
-    display_results(actual, predictions, mse)
+    accuracy = calculate_accuracy(actual, predictions)
+    display_results(actual, predictions, mse, accuracy)
 
 if __name__ == '__main__':
     main()
