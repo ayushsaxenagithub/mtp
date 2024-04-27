@@ -57,8 +57,8 @@ def main():
     print(f'Test Loss: {test_loss}')
 
     # Save the model
-    model.save('pressure_strain_prediction_model.h5')
-    print('Model saved to pressure_strain_prediction_model.h5')
+    model.save('dnn.h5')
+    print('Model saved to dnn.h5')
 
 if __name__ == "__main__":
     main()
