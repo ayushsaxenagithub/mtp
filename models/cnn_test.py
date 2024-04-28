@@ -9,13 +9,17 @@ from joblib import load
 def load_data(filepath, scaler_path):
     data = pd.read_excel(filepath)
     features = data.drop(['Pressure_Strain', 'FileType', 'Dataset'], axis=1)
-    
+    target = data['Pressure_Strain']
+
+    # Handle missing values in features and target
+    features.fillna(features.mean(), inplace=True)
+    target.fillna(target.mean(), inplace=True)
+
     # Load and apply scaler
     scaler = load(scaler_path)
     features = scaler.transform(features)
     features = np.expand_dims(features, axis=2)  # Reshape for Conv1D
 
-    target = data['Pressure_Strain']
     return features, target
 
 def predict(model_path, features):
@@ -24,20 +28,18 @@ def predict(model_path, features):
     return predictions.flatten()
 
 def calculate_accuracy(actual, predictions):
-    # Calculate Mean Absolute Percentage Error (MAPE)
-    mape = np.mean(np.abs((actual - predictions) / actual)) * 100
+    # Avoid division by zero in MAPE calculation by adding a small constant
+    mape = np.mean(np.abs((actual - predictions) / (actual + np.finfo(float).eps))) * 100
     return 100 - mape  # Convert to accuracy
 
 def display_results(actual, predictions):
+    accuracy = calculate_accuracy(actual, predictions)
     root = tk.Tk()
     root.title("CNN Model Predictions")
     tree = ttk.Treeview(root, columns=('Actual', 'Predicted'), show='headings')
     tree.heading('Actual', text='Actual Pressure Strain')
     tree.heading('Predicted', text='Predicted Pressure Strain')
     tree.pack(fill=tk.BOTH, expand=True)
-
-    # Calculate accuracy
-    accuracy = calculate_accuracy(actual, predictions)
 
     for act, pred in zip(actual, predictions):
         tree.insert('', 'end', values=(act, pred))

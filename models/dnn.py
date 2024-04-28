@@ -33,7 +33,7 @@ def build_and_compile_model(input_shape):
     return model
 
 def main():
-    filepath = 'combined_data_all_reynolds_20PI_100PI.xlsx'
+    filepath = 'testing.xlsx'
     X_train, X_test, y_train, y_test, feature_names = load_and_preprocess_data(filepath)
     model = build_and_compile_model(len(feature_names))
     model.fit(X_train, y_train, epochs=100, validation_split=0.2, verbose=1)
